@@ -27,12 +27,11 @@ public class DepartmentDaoJDBC implements DepartmentDao {
 		try {
 			st = conn.prepareStatement(
 					"INSERT INTO department "
-					+ "(Id, Name) "
+					+ "(Name) "
 					+ "VALUES "
-					+ "(?, ?)", Statement.RETURN_GENERATED_KEYS);
+					+ "(?)", Statement.RETURN_GENERATED_KEYS);
 			
-			st.setInt(1, obj.getId());
-			st.setString(2, obj.getName());
+			st.setString(1, obj.getName());
 			
 			int rowsAffected = st.executeUpdate();
 			
@@ -41,6 +40,8 @@ public class DepartmentDaoJDBC implements DepartmentDao {
 				if(rs.next()) {
 					int id = rs.getInt(1);
 					obj.setId(id);
+				} else {
+					throw new DbException("Unexpected error! no rows affected");
 				}
 				DB.closeResultSet(rs);
 			}
@@ -56,43 +57,48 @@ public class DepartmentDaoJDBC implements DepartmentDao {
 	@Override
 	public void update(Department obj) {
 		
+		
+		
+	}
+
+	@Override
+	public void deleteById(Integer id) {
+		
+		
+		
+	}
+
+	@Override
+	public Department findById(Integer id) {
+		
 		PreparedStatement st = null;
+		ResultSet rs = null;
 		try {
 			st = conn.prepareStatement(
-					"UPDATE department "
-					+ "SET Id = ?, Name = ? "
-					+ "WHERE Id = ?");
-			
-			st.setInt(1, obj.getId());
-			st.setString(2, obj.getName());
-			st.setInt(3, obj.getId());
-			
-			st.executeUpdate();
-			
+					"SELECT * FROM department WHERE Id =?");
+			st.setInt(1, id);
+			rs = st.executeQuery();
+			if(rs.next()) {
+				Department obj = new Department();
+				obj.setId(rs.getInt("Id"));
+				obj.setName(rs.getString("Name"));
+				return obj;
+			}
+			return null;
 		} catch(SQLException e) {
 			throw new DbException(e.getMessage());
-		} finally {
+		}finally {
+			DB.closeResultSet(rs);
 			DB.closeStatement(st);
 		}
 		
 	}
 
 	@Override
-	public void deleteById(Integer id) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public Department findById(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public List<Department> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		
+		
 	}
 
 	
